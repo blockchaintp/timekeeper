@@ -80,6 +80,12 @@
       <properties></properties>
     </profile>
   </profiles>
+
+  <properties>
+    <protobuf.version>3.10.0</protobuf.version>
+    <proto.directory>src/main/protos</proto.directory>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -114,6 +120,41 @@
             </manifest>
           </archive>
         </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.xolstice.maven.plugins</groupId>
+          <artifactId>protobuf-maven-plugin</artifactId>
+          <version>0.6.1</version>
+          <configuration>
+            <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+            <protoSourceRoot>${proto.directory}</protoSourceRoot>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/protobuf/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -160,8 +201,13 @@
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java-util</artifactId>
-      <version>3.8.0</version>
+      <version>${protobuf.version}</version>
     </dependency>
     <!-- Unit testing -->
     <dependency>
