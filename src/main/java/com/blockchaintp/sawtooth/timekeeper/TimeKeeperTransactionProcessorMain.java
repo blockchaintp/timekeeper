@@ -18,10 +18,11 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.blockchaintp.sawtooth.daml.messaging.ZmqStream;
+import com.blockchaintp.sawtooth.messaging.ZmqStream;
 import com.blockchaintp.sawtooth.timekeeper.processor.TimeKeeperTransactionHandler;
 import com.blockchaintp.utils.InMemoryKeyManager;
 import com.blockchaintp.utils.KeyManager;
+import com.blockchaintp.utils.LogUtils;
 
 import sawtooth.sdk.messaging.Stream;
 import sawtooth.sdk.processor.TransactionHandler;
@@ -33,6 +34,7 @@ import sawtooth.sdk.processor.TransactionProcessor;
  */
 public final class TimeKeeperTransactionProcessorMain {
 
+  private static final int DEFAULT_TK_UPDATE_SECONDS = 20;
   private static final Logger LOGGER = LoggerFactory.getLogger(TimeKeeperTransactionProcessorMain.class);
 
   /**
@@ -41,15 +43,41 @@ public final class TimeKeeperTransactionProcessorMain {
    *             component endpoint, e.g. tcp://localhost:4004
    */
   public static void main(final String[] args) {
+
+    var vCount = 0;
+    var connectStr = "tcp://localhost:4004";
+    long period = DEFAULT_TK_UPDATE_SECONDS;
+
+    for (String s : args) {
+      if (s.startsWith("-v")) {
+        for (var i = 0; i < s.length(); i++) {
+          if (s.charAt(i) == 'v') {
+            vCount++;
+          }
+        }
+      } else if (s.startsWith("-p")) {
+        var val = s.substring(2);
+        if (val.length() > 0) {
+          try {
+            period = Integer.valueOf(val);
+          } catch (NumberFormatException nfe) {
+            LOGGER.warn("Invalid format specified for period: {}", val);
+            period = DEFAULT_TK_UPDATE_SECONDS;
+          }
+        }
+      } else {
+        connectStr = s;
+      }
+    }
+    LogUtils.setRootLogLevel(vCount);
+
     ScheduledExecutorService clockExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    Stream stream = new ZmqStream(args[0]);
+    Stream stream = new ZmqStream(connectStr);
     KeyManager kmgr = InMemoryKeyManager.create();
-    final long period = 20;
-    final TimeUnit periodUnit = TimeUnit.SECONDS;
-    clockExecutor.scheduleWithFixedDelay(new TimeKeeperRunnable(kmgr, stream), period, period, periodUnit);
+    clockExecutor.scheduleWithFixedDelay(new TimeKeeperRunnable(kmgr, stream), period, period, TimeUnit.SECONDS);
 
-    TransactionProcessor transactionProcessor = new TransactionProcessor(args[0]);
+    TransactionProcessor transactionProcessor = new TransactionProcessor(connectStr);
     TransactionHandler handler = new TimeKeeperTransactionHandler();
     transactionProcessor.addHandler(handler);
 
@@ -60,6 +88,7 @@ public final class TimeKeeperTransactionProcessorMain {
       clockExecutor.shutdownNow();
     } catch (InterruptedException exc) {
       LOGGER.warn("TransactionProcessor was interrupted");
+      Thread.currentThread().interrupt();
     }
   }
 
