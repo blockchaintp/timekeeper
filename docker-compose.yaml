@@ -16,9 +16,9 @@ version: '2.1'
 
 services:
 
-  sawtooth-timekeeper:
+  timekeeper:
     build:
       context: .
       dockerfile: docker/timekeeper.docker
     image: timekeeper:${ISOLATION_ID}
-    container_name: sawtooth-timekeeper
+    container_name: timekeeper

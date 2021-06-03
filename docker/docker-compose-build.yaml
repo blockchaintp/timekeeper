@@ -16,7 +16,7 @@ version: '2.1'
 
 services:
 
-  daml-on-sawtooth-build:
+  toolchain:
     build:
       context: .
       dockerfile: toolchain.docker

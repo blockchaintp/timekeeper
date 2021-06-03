@@ -46,8 +46,8 @@ MAVEN_UPDATE_RELEASE_INFO != if [ "$(LONG_VERSION)" = "$(VERSION)" ] || \
 MAVEN_DEPLOY_TARGET = $(MAVEN_REPO_TARGET)::default::$(MAVEN_REPO_BASE)-$(MAVEN_REPO_TARGET)
 
 TOOLCHAIN := docker run --rm -v $(HOME)/.m2/repository:/root/.m2/repository \
-		-v $(MAVEN_SETTINGS):/root/.m2/settings.xml -v `pwd`:/project/daml-on-sawtooth \
-		daml-on-sawtooth-build-local:$(ISOLATION_ID)
+		-v $(MAVEN_SETTINGS):/root/.m2/settings.xml -v `pwd`:/project/$(REPO) \
+		toolchain:$(ISOLATION_ID)
 DEPLOY_MVN := $(TOOLCHAIN) mvn -Drevision=$(MAVEN_REVISION)
 DOCKER_MVN := $(TOOLCHAIN) mvn -Drevision=$(MAVEN_REVISION) -B
 
@@ -115,8 +115,8 @@ analyze_sonar: package
 .PHONY: clean
 clean: clean_dirs
 	$(DOCKER_MVN) clean || true
-	docker-compose -f docker/docker-compose.yaml rm -f || true
-	docker-compose -f docker/docker-compose.yaml down -v || true
+	docker-compose -f docker-compose.yaml rm -f || true
+	docker-compose -f docker-compose.yaml down -v || true
 	docker-compose -f docker/docker-compose-build.yaml rm -f || true
 	docker-compose -f docker/docker-compose-build.yaml down -v || true
 
