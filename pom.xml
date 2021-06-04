@@ -233,12 +233,12 @@
     <dependency>
       <groupId>com.blockchaintp</groupId>
       <artifactId>sawtooth-mttp</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.1</version>
     </dependency>
     <dependency>
       <groupId>com.blockchaintp</groupId>
       <artifactId>sawtooth-utils</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.1</version>
     </dependency>
   </dependencies>
 </project>
