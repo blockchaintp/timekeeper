@@ -75,6 +75,7 @@ pipeline {
             make test
           '''
         }
+        junit 'target/surefire-reports/*.xml'
       }
     }
 

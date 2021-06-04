@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  -->
- <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.blockchaintp.timekeeper</groupId>
   <artifactId>timekeeper</artifactId>
@@ -103,14 +101,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.12.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.0.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>3.1.2</version>
         <configuration>
           <archive>
             <manifest>
@@ -122,21 +123,21 @@
         </configuration>
       </plugin>
       <plugin>
-          <groupId>org.xolstice.maven.plugins</groupId>
-          <artifactId>protobuf-maven-plugin</artifactId>
-          <version>0.6.1</version>
-          <configuration>
-            <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
-            <protoSourceRoot>${proto.directory}</protoSourceRoot>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>compile</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.6.1</version>
+        <configuration>
+          <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+          <protoSourceRoot>${proto.directory}</protoSourceRoot>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -221,12 +222,6 @@
       <artifactId>mockito-core</artifactId>
       <version>2.27.0</version>
       <scope>test</scope>
-  </dependency>
-    <!-- Hyperledger Sawtooth -->
-    <dependency>
-      <groupId>org.hyperledger.sawtooth</groupId>
-      <artifactId>sawtooth-sdk-transaction-processor</artifactId>
-      <version>v0.1.3</version>
     </dependency>
     <!-- Apache Commons -->
     <dependency>
@@ -236,9 +231,14 @@
     </dependency>
     <!-- BTP -->
     <dependency>
-      <groupId>daml-on-sawtooth</groupId>
-      <artifactId>sawtooth-daml-common</artifactId>
-      <version>1.3.10-SNAPSHOT</version>
+      <groupId>com.blockchaintp</groupId>
+      <artifactId>sawtooth-mttp</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.blockchaintp</groupId>
+      <artifactId>sawtooth-utils</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
