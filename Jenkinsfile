@@ -84,15 +84,10 @@ pipeline {
         withSonarQubeEnv('sonarcloud') {
           configFileProvider([configFile(fileId: 'global-maven-settings', variable: 'MAVEN_SETTINGS')]) {
             sh '''
-              make clean analyze
+              make analyze
             '''
           }
         }
-      }
-    }
-
-    stage("Quality gate") {
-      steps {
         waitForQualityGate abortPipeline: true
       }
     }
@@ -115,7 +110,7 @@ pipeline {
       steps {
         configFileProvider([configFile(fileId: 'global-maven-settings', variable: 'MAVEN_SETTINGS')]) {
           sh '''
-            make clean publish
+            make publish
           '''
         }
       }
