@@ -1,2 +1,4 @@
 build
 .factorypath
+markers
+**/pom.xml.versionsBackup
