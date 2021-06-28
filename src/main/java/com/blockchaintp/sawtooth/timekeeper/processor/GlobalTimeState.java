@@ -102,14 +102,14 @@ public final class GlobalTimeState {
    * @param update      the timestamp to use for update
    */
   public void addUpdate(final ByteString participant, final Timestamp update) {
-    if (!participantTimes.containsKey(participant)) {
-      LOGGER.info("New TimeKeeper particpant detected {}", participant.toStringUtf8());
+    if (LOGGER.isDebugEnabled() && !participantTimes.containsKey(participant))  {
+        LOGGER.info("New TimeKeeper particpant detected {}", participant.toStringUtf8());
     }
     Timestamp prevPartTime = participantTimes.getOrDefault(participant, Timestamps.EPOCH);
 
     Timestamp newTime = TimestampUtils.max(prevPartTime, List.of(update));
-    if (newTime.getSeconds() != prevPartTime.getSeconds()) {
-      LOGGER.debug("Particpant {} new time={}", participant.toStringUtf8(), new Date(Timestamps.toMillis(newTime)));
+    if (LOGGER.isDebugEnabled() && newTime.getSeconds() != prevPartTime.getSeconds()) {
+        LOGGER.debug("Particpant {} new time={}", participant.toStringUtf8(), new Date(Timestamps.toMillis(newTime)));
     }
     participantTimes.put(participant, newTime);
     pruneExpiredParticipants(participantTimes);
