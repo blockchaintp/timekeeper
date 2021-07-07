@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## v0.0.2
+## v1.3.11
+
+* Merge log conditions
+* Guard expensive log operations
+
+## v1.3.10
 
 * build(pom): change group id
 * build(deps): pin to paralos-java 0.0.1
