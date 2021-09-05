@@ -66,6 +66,7 @@ public final class TimeKeeperTransactionProcessorMain {
     final TimeKeeperTransactionProcessorMain main = new TimeKeeperTransactionProcessorMain();
     try {
       main.parseArgs(args);
+      main.start();
     } catch (InvalidCommandException e) {
       System.err.println(e.getMessage()); //NOSONAR
       System.exit(-1);
@@ -81,12 +82,14 @@ public final class TimeKeeperTransactionProcessorMain {
     Stream stream = new ZmqStream(connectStr); //NOSONAR
 
     if (startSubmitter) {
+      LOGGER.info("Starting submitter to {}", connectStr);
       KeyManager keyManager = InMemoryKeyManager.create();
       clockExecutor.scheduleWithFixedDelay(new TimeKeeperRunnable(keyManager, stream), updatePeriod, updatePeriod,
           TimeUnit.SECONDS);
     }
 
     if (startTp) {
+      LOGGER.info("Starting transaction processor against {}", connectStr);
       TransactionProcessor transactionProcessor = new TransactionProcessor(connectStr);
       TransactionHandler handler = new TimeKeeperTransactionHandler();
       transactionProcessor.addHandler(handler);
