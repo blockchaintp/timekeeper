@@ -1,3 +1,16 @@
+/*
+ * Copyright 2021 Blockchain Technology Partners
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.blockchaintp.sawtooth.timekeeper;
 
 import static org.junit.Assert.assertTrue;
@@ -41,40 +54,42 @@ public class GlobalTimeStateV1Test {
   @Test
   public void testV1Consistent() throws InvalidProtocolBufferException {
     List<Long> test = new ArrayList<>();
-    long max=80L;
+    long max = 80L;
     for (int i = 0; i < 2000; i++) {
-      max+=20L;
+      max += 20L;
       test.add(max);
     }
     List<TimeKeeperUpdate> v1TestUpdates = v1updates(test.toArray(new Long[] {}));
 
     List<ByteString> participants = new ArrayList<>();
-    for ( int i = 0; i < 10; i++ ) {
-      participants.add(ByteString.copyFrom("participant-"+i, Charset.defaultCharset()));
+    for (int i = 0; i < 10; i++) {
+      participants.add(ByteString.copyFrom("participant-" + i, Charset.defaultCharset()));
     }
 
     GlobalTimeState gState = new GlobalTimeState();
-    int count=0;
-    for (TimeKeeperUpdate u: v1TestUpdates) {
+    int count = 0;
+    for (TimeKeeperUpdate u : v1TestUpdates) {
       int pIndex = count % participants.size();
       count++;
       gState.addUpdate(participants.get(pIndex), u);
       // Global State History v1 grows forever which is a problem but needs to stay for now
-      if (count > (participants.size()* GlobalTimeState.MAX_TIME_HISTORY)) {
-        assertTrue(String.format("%s < %s", gState.toTimeKeeperGlobalRecord().getTimeHistoryCount(),GlobalTimeState.MAX_TIME_HISTORY),
-          gState.toTimeKeeperGlobalRecord().getTimeHistoryCount()>GlobalTimeState.MAX_TIME_HISTORY);
+      if (count > (participants.size() * GlobalTimeState.MAX_TIME_HISTORY)) {
+        assertTrue(
+            String.format("%s < %s", gState.toTimeKeeperGlobalRecord().getTimeHistoryCount(),
+                GlobalTimeState.MAX_TIME_HISTORY),
+            gState.toTimeKeeperGlobalRecord().getTimeHistoryCount() > GlobalTimeState.MAX_TIME_HISTORY);
       }
     }
 
     test.clear();
     for (int i = 0; i < 2000; i++) {
-      max+=20L;
+      max += 20L;
       test.add(max);
     }
     v1TestUpdates = v1updates(test.toArray(new Long[] {}));
 
-    count=0;
-    for (TimeKeeperUpdate u: v1TestUpdates) {
+    count = 0;
+    for (TimeKeeperUpdate u : v1TestUpdates) {
       int pIndex = count % participants.size();
       count++;
       // Skip updates from the first so that it falls behind
@@ -87,7 +102,7 @@ public class GlobalTimeStateV1Test {
       // participant should drop oout
       if (count > 10) {
         assertTrue(String.format(" %s >= 10", gState.toTimeKeeperGlobalRecord().getParticipantCount()),
-          gState.toTimeKeeperGlobalRecord().getParticipantCount() < 10 );
+            gState.toTimeKeeperGlobalRecord().getParticipantCount() < 10);
       }
     }
     TimeKeeperGlobalRecord tkgr = gState.toTimeKeeperGlobalRecord();
@@ -99,49 +114,50 @@ public class GlobalTimeStateV1Test {
   @Test
   public void testV12Upgrade() throws InvalidProtocolBufferException {
     List<Long> test = new ArrayList<>();
-    long max=80L;
+    long max = 80L;
     for (int i = 0; i < 2000; i++) {
-      max+=20L;
+      max += 20L;
       test.add(max);
     }
     List<TimeKeeperUpdate> v1TestUpdates = v1updates(test.toArray(new Long[] {}));
 
     List<ByteString> participants = new ArrayList<>();
-    for ( int i = 0; i < 10; i++ ) {
-      participants.add(ByteString.copyFrom("participant-"+i, Charset.defaultCharset()));
+    for (int i = 0; i < 10; i++) {
+      participants.add(ByteString.copyFrom("participant-" + i, Charset.defaultCharset()));
     }
 
     GlobalTimeState gState = new GlobalTimeState();
-    int count=0;
-    for (TimeKeeperUpdate u: v1TestUpdates) {
+    int count = 0;
+    for (TimeKeeperUpdate u : v1TestUpdates) {
       int pIndex = count % participants.size();
       count++;
       gState.addUpdate(participants.get(pIndex), u);
       // Global State History v1 grows forever which is a problem but needs to stay for now
-      if (count > (participants.size()* GlobalTimeState.MAX_TIME_HISTORY)) {
-        assertTrue(String.format("%s < %s", gState.toTimeKeeperGlobalRecord().getTimeHistoryCount(),GlobalTimeState.MAX_TIME_HISTORY),
-          gState.toTimeKeeperGlobalRecord().getTimeHistoryCount()>GlobalTimeState.MAX_TIME_HISTORY);
+      if (count > (participants.size() * GlobalTimeState.MAX_TIME_HISTORY)) {
+        assertTrue(
+            String.format("%s < %s", gState.toTimeKeeperGlobalRecord().getTimeHistoryCount(),
+                GlobalTimeState.MAX_TIME_HISTORY),
+            gState.toTimeKeeperGlobalRecord().getTimeHistoryCount() > GlobalTimeState.MAX_TIME_HISTORY);
       }
     }
 
     for (int i = 0; i < 2000; i++) {
-      max+=20L;
+      max += 20L;
       test.add(max);
     }
     List<TimeKeeperUpdate> v2TestUpdates = v2updates(200, 100, test.toArray(new Long[] {}));
 
-    count=0;
-    for (TimeKeeperUpdate u: v2TestUpdates) {
+    count = 0;
+    for (TimeKeeperUpdate u : v2TestUpdates) {
       int pIndex = count % participants.size();
       count++;
       gState.addUpdate(participants.get(pIndex), u);
       // v2 should not keep history in global state
-      TimeKeeperGlobalRecord tkgr=gState.toTimeKeeperGlobalRecord();
+      TimeKeeperGlobalRecord tkgr = gState.toTimeKeeperGlobalRecord();
       assertEquals(TimeKeeperVersion.V_2_0, tkgr.getVersion());
       assertEquals(0, tkgr.getTimeHistoryCount());
       //
     }
-
 
   }
 

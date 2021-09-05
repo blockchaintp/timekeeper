@@ -1,15 +1,16 @@
-/* Copyright 2019-21 Blockchain Technology Partners
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-     http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-------------------------------------------------------------------------------*/
-
+/*
+ * Copyright 2019 Blockchain Technology Partners
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.blockchaintp.sawtooth.timekeeper.processor;
 
 import java.util.Arrays;
@@ -42,8 +43,8 @@ import sawtooth.sdk.protobuf.TpProcessRequest;
 import sawtooth.sdk.protobuf.TransactionHeader;
 
 /**
- * Accepts and validates TimeKeeperUpdate transactions and issues an event
- * containing the globally agreed time.
+ * Accepts and validates TimeKeeperUpdate transactions and issues an event containing the globally
+ * agreed time.
  */
 public final class TimeKeeperTransactionHandler implements TransactionHandler {
 
@@ -149,11 +150,12 @@ public final class TimeKeeperTransactionHandler implements TransactionHandler {
   /**
    * Fundamental checks of the transaction.
    *
-   * @param tpProcessRequest the process request
-   * @throws InvalidTransactionException if the transaction fails because of a
-   *                                     business rule validation error
-   * @throws InternalError               if the transaction fails because of a
-   *                                     system error
+   * @param tpProcessRequest
+   *          the process request
+   * @throws InvalidTransactionException
+   *           if the transaction fails because of a business rule validation error
+   * @throws InternalError
+   *           if the transaction fails because of a system error
    */
   private void basicRequestChecks(final TpProcessRequest tpProcessRequest)
       throws InvalidTransactionException, InternalError {

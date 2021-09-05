@@ -1,16 +1,23 @@
-/* Copyright 2019-21 Blockchain Technology Partners
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-     http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-------------------------------------------------------------------------------*/
-
+/*
+ * Copyright 2019 Blockchain Technology Partners
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.blockchaintp.sawtooth.timekeeper.processor;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperGlobalRecord;
 import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperGlobalRecord.Builder;
@@ -20,12 +27,6 @@ import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperVersion;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,17 +56,17 @@ public final class GlobalTimeState {
   private TimeKeeperVersion version;
 
   /**
-   * Create a new global time state object and initialize with the provided
-   * record.
+   * Create a new global time state object and initialize with the provided record.
    *
-   * @param record the current TimeKeeperGlobal record
+   * @param globalRecord
+   *          the current TimeKeeperGlobal record
    */
-  public GlobalTimeState(final TimeKeeperGlobalRecord record) {
+  public GlobalTimeState(final TimeKeeperGlobalRecord globalRecord) {
     this();
-    this.currentTime = record.getLastCalculatedTime();
-    this.history.addAll(record.getTimeHistoryList());
-    this.version = record.getVersion();
-    for (final TimeKeeperParticipant p : record.getParticipantList()) {
+    this.currentTime = globalRecord.getLastCalculatedTime();
+    this.history.addAll(globalRecord.getTimeHistoryList());
+    this.version = globalRecord.getVersion();
+    for (final TimeKeeperParticipant p : globalRecord.getParticipantList()) {
       participantTimes.put(p.getParticipantPublicKey(), p.getLastCalculatedTime());
     }
     // do nothing else as this TimeKeeperRecord is presumed to already be
@@ -85,8 +86,10 @@ public final class GlobalTimeState {
   /**
    * Update this time state with and update from this participant.
    *
-   * @param participant the participant public identifier
-   * @param update      the update
+   * @param participant
+   *          the participant public identifier
+   * @param update
+   *          the update
    */
   public void addUpdate(final ByteString participant, final TimeKeeperUpdate update) {
     if (update.getVersion().equals(TimeKeeperVersion.V_2_0)) {
@@ -98,18 +101,20 @@ public final class GlobalTimeState {
   /**
    * Update this time state with and update from this participant.
    *
-   * @param participant the participant public identifier
-   * @param update      the timestamp to use for update
+   * @param participant
+   *          the participant public identifier
+   * @param update
+   *          the timestamp to use for update
    */
   public void addUpdate(final ByteString participant, final Timestamp update) {
-    if (LOGGER.isDebugEnabled() && !participantTimes.containsKey(participant))  {
-        LOGGER.info("New TimeKeeper particpant detected {}", participant.toStringUtf8());
+    if (LOGGER.isDebugEnabled() && !participantTimes.containsKey(participant)) {
+      LOGGER.info("New TimeKeeper particpant detected {}", participant.toStringUtf8());
     }
     Timestamp prevPartTime = participantTimes.getOrDefault(participant, Timestamps.EPOCH);
 
     Timestamp newTime = TimestampUtils.max(prevPartTime, List.of(update));
     if (LOGGER.isDebugEnabled() && newTime.getSeconds() != prevPartTime.getSeconds()) {
-        LOGGER.debug("Particpant {} new time={}", participant.toStringUtf8(), new Date(Timestamps.toMillis(newTime)));
+      LOGGER.debug("Particpant {} new time={}", participant.toStringUtf8(), new Date(Timestamps.toMillis(newTime)));
     }
     participantTimes.put(participant, newTime);
     pruneExpiredParticipants(participantTimes);

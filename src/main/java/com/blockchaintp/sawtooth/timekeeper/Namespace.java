@@ -1,21 +1,23 @@
-/* Copyright 2019 Blockchain Technology Partners
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-     http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-------------------------------------------------------------------------------*/
+/*
+ * Copyright 2019 Blockchain Technology Partners
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.blockchaintp.sawtooth.timekeeper;
 
 import com.blockchaintp.sawtooth.SawtoothClientUtils;
 
 /**
- * Utility class dealing with the common namespace functions and values with
- * Sawtooth and DAML.
+ * Utility class dealing with the common namespace functions and values with Sawtooth and DAML.
+ *
  * @author scealiontach
  */
 public final class Namespace {
@@ -52,6 +54,7 @@ public final class Namespace {
 
   /**
    * The first 6 characters of the family name hash.
+   *
    * @return The first 6 characters of the family name hash
    */
   public static String getNameSpace() {
@@ -60,8 +63,11 @@ public final class Namespace {
 
   /**
    * Make an address given a namespace, and list of parts in order.
-   * @param ns    the namespace byte string
-   * @param parts one or more string part components
+   *
+   * @param ns
+   *          the namespace byte string
+   * @param parts
+   *          one or more string part components
    * @return the hash of the collected address
    */
   public static String makeAddress(final String ns, final String... parts) {

@@ -1,14 +1,16 @@
-/* Copyright 2019 Blockchain Technology Partners
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-     http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-------------------------------------------------------------------------------*/
+/*
+ * Copyright 2019 Blockchain Technology Partners
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.blockchaintp.sawtooth.timekeeper;
 
 import java.util.List;
@@ -51,35 +53,39 @@ public final class TimeKeeperTransactionProcessorMain {
   private static final String OPT_BOTH = "b";
   private static final String OPT_VERBOSE = "v";
 
-  int vCount = 0;
-  int updatePeriod = DEFAULT_TK_UPDATE_SECONDS;
-  String connectStr = DEFAULT_CONNECT_STRING;
-  boolean startTp = true;
-  boolean startSubmitter = true;
+  private int vCount = 0;
+  private int updatePeriod = DEFAULT_TK_UPDATE_SECONDS;
+  private String connectStr = DEFAULT_CONNECT_STRING;
+  private boolean startTp = true;
+  private boolean startSubmitter = true;
 
   /**
    * A basic main method for this transaction processor.
-   * @param args at this time only one argument the address of the validator
-   *             component endpoint, e.g. tcp://localhost:4004
+   *
+   * @param args
+   *          at this time only one argument the address of the validator component endpoint, e.g.
+   *          tcp://localhost:4004
    */
+  @SuppressWarnings("java:S106")
   public static void main(final String[] args) {
     final TimeKeeperTransactionProcessorMain main = new TimeKeeperTransactionProcessorMain();
     try {
       main.parseArgs(args);
       main.start();
     } catch (InvalidCommandException e) {
-      System.err.println(e.getMessage()); //NOSONAR
+      System.err.println(e.getMessage());
       System.exit(-1);
     }
 
   }
 
-  public void start() {
+  @SuppressWarnings("java:S2095")
+  private void start() {
     LogUtils.setRootLogLevel(vCount);
 
     ScheduledExecutorService clockExecutor = Executors.newSingleThreadScheduledExecutor();
 
-    Stream stream = new ZmqStream(connectStr); //NOSONAR
+    Stream stream = new ZmqStream(connectStr);
 
     if (startSubmitter) {
       LOGGER.info("Starting submitter to {}", connectStr);
@@ -111,40 +117,20 @@ public final class TimeKeeperTransactionProcessorMain {
   }
 
   private Options createOptions() {
-    Option connect = Option.builder("C")
-                            .argName("endpoint")
-                            .longOpt("connect")
-                            .hasArg()
-                            .required(false)
-                            .desc("Give the validator ZMQ endpoint to connect to")
-                            .build();
+    Option connect = Option.builder("C").argName("endpoint").longOpt("connect").hasArg().required(false)
+        .desc("Give the validator ZMQ endpoint to connect to").build();
 
-    Option period = Option.builder("p")
-                          .argName("period")
-                          .longOpt("period")
-                          .hasArg()
-                          .desc("Ho often to send time updates")
-                          .build();
+    Option period = Option.builder("p").argName("period").longOpt("period").hasArg()
+        .desc("Ho often to send time updates").build();
 
-    Option verbose = Option.builder("v")
-                          .desc("Verbosity. Repeat for greater detail.")
-                          .build();
+    Option verbose = Option.builder("v").desc("Verbosity. Repeat for greater detail.").build();
 
+    Option submitter = Option.builder("s").longOpt("submitter").desc("Set to run the submitter").build();
 
-    Option submitter = Option.builder("s")
-                          .longOpt("submitter")
-                          .desc("Set to run the submitter")
-                          .build();
+    Option tp = Option.builder("t").longOpt("tp").desc("Set to run the transaction processr").build();
 
-    Option tp = Option.builder("t")
-                      .longOpt("tp")
-                      .desc("Set to run the transaction processr")
-                      .build();
-
-    Option both = Option.builder("b")
-                        .longOpt("both")
-                        .desc("Set to run both the tp and the submitter [default]")
-                        .build();
+    Option both = Option.builder("b").longOpt("both").desc("Set to run both the tp and the submitter [default]")
+        .build();
 
     OptionGroup mode = new OptionGroup();
     mode.setRequired(false);
@@ -161,7 +147,8 @@ public final class TimeKeeperTransactionProcessorMain {
     return options;
   }
 
-  private void parseArgs(String[] args) throws InvalidCommandException {
+  @SuppressWarnings("java:S4165")
+  private void parseArgs(final String[] args) throws InvalidCommandException {
     Options options = createOptions();
 
     CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
@@ -186,7 +173,7 @@ public final class TimeKeeperTransactionProcessorMain {
     }
 
     if (cmd.hasOption(OPT_VERBOSE)) {
-      for (Option o: cmd.getOptions()) {
+      for (Option o : cmd.getOptions()) {
         if (o.getOpt().equals(OPT_VERBOSE)) {
           vCount++;
         }
@@ -197,14 +184,14 @@ public final class TimeKeeperTransactionProcessorMain {
     startSubmitter = true;
 
     if (cmd.hasOption(OPT_SUBMITTER)) {
-      startSubmitter = true; //NOSONAR
+      startSubmitter = true;
       startTp = false;
     } else if (cmd.hasOption(OPT_TP)) {
       startSubmitter = false;
-      startTp = true; //NOSONAR
+      startTp = true;
     } else if (cmd.hasOption(OPT_BOTH)) {
-      startSubmitter = true; //NOSONAR
-      startTp = true; //NOSONAR
+      startSubmitter = true;
+      startTp = true;
     }
 
     List<String> remainder = cmd.getArgList();

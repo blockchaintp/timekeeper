@@ -1,14 +1,16 @@
-/* Copyright 2019 Blockchain Technology Partners
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-     http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-------------------------------------------------------------------------------*/
+/*
+ * Copyright 2019 Blockchain Technology Partners
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.blockchaintp.sawtooth.timekeeper;
 
 import java.time.Clock;
@@ -17,18 +19,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.blockchaintp.keymanager.KeyManager;
 import com.blockchaintp.sawtooth.SawtoothClientUtils;
 import com.blockchaintp.sawtooth.timekeeper.exceptions.TimeKeeperException;
 import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperUpdate;
 import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperVersion;
-import com.blockchaintp.keymanager.KeyManager;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sawtooth.sdk.messaging.Future;
 import sawtooth.sdk.messaging.Stream;
@@ -40,8 +42,8 @@ import sawtooth.sdk.protobuf.Message;
 import sawtooth.sdk.protobuf.Transaction;
 
 /**
- * TimeKeeperRunnable is designed to be run in a fixed schedule thread pool,
- * where it will periodically submit a TimeKeeperUpdate.
+ * TimeKeeperRunnable is designed to be run in a fixed schedule thread pool, where it will
+ * periodically submit a TimeKeeperUpdate.
  */
 public final class TimeKeeperRunnable implements Runnable {
 
@@ -63,9 +65,10 @@ public final class TimeKeeperRunnable implements Runnable {
   /**
    * Main constructor.
    *
-   * @param kmgr      A key manager implementation which will provide a keys for
-   *                  the transactions,
-   * @param argStream the stream connecting to the validator.
+   * @param kmgr
+   *          A key manager implementation which will provide a keys for the transactions,
+   * @param argStream
+   *          the stream connecting to the validator.
    */
   public TimeKeeperRunnable(final KeyManager kmgr, final Stream argStream) {
     this.keyManager = kmgr;

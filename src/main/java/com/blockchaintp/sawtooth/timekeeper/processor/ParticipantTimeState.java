@@ -1,26 +1,27 @@
-/* Copyright 2019-21 Blockchain Technology Partners
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-     http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-------------------------------------------------------------------------------*/
-
+/*
+ * Copyright 2019 Blockchain Technology Partners
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package com.blockchaintp.sawtooth.timekeeper.processor;
-
-import com.blockchaintp.sawtooth.timekeeper.exceptions.TimeKeeperException;
-import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperRecord;
-import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperUpdate;
-import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperVersion;
-import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperRecord.Builder;
-import com.google.protobuf.Timestamp;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.blockchaintp.sawtooth.timekeeper.exceptions.TimeKeeperException;
+import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperRecord;
+import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperRecord.Builder;
+import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperUpdate;
+import com.blockchaintp.sawtooth.timekeeper.protobuf.TimeKeeperVersion;
+import com.google.protobuf.Timestamp;
 
 /**
  * Handles the time values of a given participant.
@@ -47,7 +48,8 @@ public final class ParticipantTimeState {
   /**
    * Create a new ParticipantTimeState based on the provided record.
    *
-   * @param tkRecord the record of this participant
+   * @param tkRecord
+   *          the record of this participant
    */
   public ParticipantTimeState(final TimeKeeperRecord tkRecord) {
     this.history = new ArrayList<>();
@@ -61,7 +63,8 @@ public final class ParticipantTimeState {
   /**
    * Create an initial state from an individual TimeKeeperUpdate.
    *
-   * @param update the update to initialize with
+   * @param update
+   *          the update to initialize with
    */
   public ParticipantTimeState(final TimeKeeperUpdate update) {
     currentTime = update.getTimeUpdate();
@@ -80,9 +83,10 @@ public final class ParticipantTimeState {
   /**
    * Update this time state with and update from this participant.
    *
-   * @param update the update
-   * @throws TimeKeeperException when an incorrect style of update is sent to this
-   * ParticipantTimeState
+   * @param update
+   *          the update
+   * @throws TimeKeeperException
+   *           when an incorrect style of update is sent to this ParticipantTimeState
    */
   public void addUpdate(final TimeKeeperUpdate update) throws TimeKeeperException {
     if (update.getVersion().equals(TimeKeeperVersion.V_1_0)) {
