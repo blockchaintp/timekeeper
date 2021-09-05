@@ -105,6 +105,56 @@
           </dependency>
         </dependencies>
       </plugin>
+
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>2.12.1</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <formats>
+            <!-- you can define as many formats as you want, each is independent -->
+            <format>
+              <!-- define the files to apply to -->
+              <includes>
+                <include>*.md</include>
+                <include>.gitignore</include>
+              </includes>
+              <!-- define the steps to apply to those files -->
+              <toggleOffOn />
+              <trimTrailingWhitespace />
+              <endWithNewline />
+              <indent>
+                <tabs>false</tabs>
+                <spaces>true</spaces>
+                <spacesPerTab>2</spacesPerTab>
+              </indent>
+            </format>
+          </formats>
+          <!-- language-specific formats -->
+          <java>
+            <eclipse>
+              <file>${basedir}/.eclipse-formatter.xml</file>
+            </eclipse>
+            <licenseHeader>
+              <file>${basedir}/.copyright-header-cstyle.txt</file>
+              <delimiter>package </delimiter>
+            </licenseHeader>
+            <toggleOffOn />
+          </java>
+          <ratchetFrom>master</ratchetFrom>
+        </configuration>
+        <executions>
+          <execution>
+            <?m2e execute onConfiguration,onIncremental?>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
@@ -113,7 +163,34 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.2</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>8.44</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <configLocation>checkstyle.xml</configLocation>
+          <headerLocation>LICENSE.txt</headerLocation>
+          <consoleOutput>true</consoleOutput>
+          <failOnViolation>true</failOnViolation>
+          <violationSeverity>warning</violationSeverity>
+          <sourceDirectories>
+            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+          </sourceDirectories>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
