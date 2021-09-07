@@ -142,7 +142,7 @@
             </licenseHeader>
             <toggleOffOn />
           </java>
-          <ratchetFrom>master</ratchetFrom>
+          <ratchetFrom>origin/master</ratchetFrom>
         </configuration>
         <executions>
           <execution>
