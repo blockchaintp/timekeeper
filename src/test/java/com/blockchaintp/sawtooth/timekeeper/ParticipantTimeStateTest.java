@@ -13,6 +13,7 @@
  */
 package com.blockchaintp.sawtooth.timekeeper;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -69,12 +70,12 @@ public class ParticipantTimeStateTest {
       TimeKeeperRecord tkr = state.toTimeKeeperRecord();
       long calcTime = tkr.getLastCalculatedTime().getSeconds();
       long uTime = u.getTimeUpdate().getSeconds();
-      assertTrue(String.format("Unexpected currentTime %s!=%s", calcTime, uTime), calcTime == uTime);
+      assertEquals(String.format("Unexpected currentTime %s!=%s", uTime, calcTime), uTime, calcTime);
       assertTrue(String.format("History size %s > 100", tkr.getTimeHistoryList().size()),
           tkr.getTimeHistoryList().size() <= 100);
-      assertTrue(tkr.getVersion().equals(TimeKeeperVersion.V_1_0));
-      assertTrue(tkr.getMaxDeviation() == 0);
-      assertTrue(tkr.getMaxHistory() == 0);
+      assertEquals(TimeKeeperVersion.V_1_0, tkr.getVersion());
+      assertEquals(0, tkr.getMaxDeviation());
+      assertEquals(0, tkr.getMaxHistory());
     }
 
     updates = v1updates(test.toArray(new Long[] {}));
@@ -82,7 +83,7 @@ public class ParticipantTimeStateTest {
       state.addUpdate(u);
       TimeKeeperRecord tkr = state.toTimeKeeperRecord();
       long calcTime = tkr.getLastCalculatedTime().getSeconds();
-      assertTrue(String.format("Unexpected currentTime %s!=%s", calcTime, max), calcTime == max);
+      assertEquals(String.format("Unexpected currentTime %s!=%s", calcTime, max), calcTime, max);
     }
   }
 
@@ -107,12 +108,12 @@ public class ParticipantTimeStateTest {
       TimeKeeperRecord tkr = state.toTimeKeeperRecord();
       long calcTime = tkr.getLastCalculatedTime().getSeconds();
       long uTime = u.getTimeUpdate().getSeconds();
-      assertTrue(String.format("Unexpected currentTime %s!=%s", calcTime, uTime), calcTime == uTime);
+      assertEquals(String.format("Unexpected currentTime %s!=%s", calcTime, uTime), calcTime, uTime);
       assertTrue(String.format("History size %s > 10", tkr.getTimeHistoryList().size()),
           tkr.getTimeHistoryList().size() <= 10);
-      assertTrue(tkr.getVersion().equals(TimeKeeperVersion.V_2_0));
-      assertTrue(String.format("Max deviation %s!=%s", tkr.getMaxDeviation(), 0), tkr.getMaxDeviation() == 0);
-      assertTrue(String.format("Max history %s!=%s", tkr.getMaxHistory(), 0), tkr.getMaxHistory() == 0);
+      assertEquals(TimeKeeperVersion.V_2_0, tkr.getVersion());
+      assertEquals(String.format("Max deviation %s!=%s", 0, tkr.getMaxDeviation()), 0, tkr.getMaxDeviation());
+      assertEquals(String.format("Max history %s!=%s", 0, tkr.getMaxHistory()), 0, tkr.getMaxHistory());
     }
 
     updates = v2updates(20, 20, test.toArray(new Long[] {}));
@@ -120,9 +121,9 @@ public class ParticipantTimeStateTest {
       state.addUpdate(u);
       TimeKeeperRecord tkr = state.toTimeKeeperRecord();
       long calcTime = tkr.getLastCalculatedTime().getSeconds();
-      assertTrue(String.format("Unexpected currentTime %s!=%s", calcTime, max), calcTime == max);
-      assertTrue(tkr.getMaxDeviation() == 20);
-      assertTrue(tkr.getMaxHistory() == 20);
+      assertEquals(String.format("Unexpected currentTime %s!=%s", max, calcTime), max, calcTime);
+      assertEquals(20, tkr.getMaxDeviation());
+      assertEquals(20, tkr.getMaxHistory());
     }
 
     updates = v1updates(test.toArray(new Long[] {}));
@@ -157,12 +158,12 @@ public class ParticipantTimeStateTest {
       TimeKeeperRecord tkr = state.toTimeKeeperRecord();
       long calcTime = tkr.getLastCalculatedTime().getSeconds();
       long uTime = u.getTimeUpdate().getSeconds();
-      assertTrue(String.format("Unexpected currentTime %s!=%s", calcTime, uTime), calcTime == uTime);
+      assertEquals(String.format("Unexpected currentTime %s!=%s", calcTime, uTime), calcTime, uTime);
       assertTrue(String.format("History size %s > 10", tkr.getTimeHistoryList().size()),
           tkr.getTimeHistoryList().size() <= 100);
-      assertTrue(tkr.getVersion().equals(TimeKeeperVersion.V_1_0));
-      assertTrue(String.format("Max deviation %s!=%s", tkr.getMaxDeviation(), 0), tkr.getMaxDeviation() == 0);
-      assertTrue(tkr.getMaxHistory() == 0);
+      assertEquals(TimeKeeperVersion.V_1_0, tkr.getVersion());
+      assertEquals(String.format("Max deviation %s!=%s", 0, tkr.getMaxDeviation()), 0, tkr.getMaxDeviation());
+      assertEquals(0, tkr.getMaxHistory());
     }
 
     List<Long> testV2 = new ArrayList<>();
@@ -177,12 +178,12 @@ public class ParticipantTimeStateTest {
       TimeKeeperRecord tkr = state.toTimeKeeperRecord();
       long calcTime = tkr.getLastCalculatedTime().getSeconds();
       long uTime = u.getTimeUpdate().getSeconds();
-      assertTrue(String.format("Unexpected currentTime %s!=%s", calcTime, uTime), calcTime == uTime);
-      assertTrue(tkr.getVersion().equals(TimeKeeperVersion.V_2_0));
+      assertEquals(String.format("Unexpected currentTime %s!=%s", calcTime, uTime), calcTime, uTime);
+      assertEquals(TimeKeeperVersion.V_2_0, tkr.getVersion());
       assertTrue(String.format("History size %s > 10", tkr.getTimeHistoryList().size()),
           tkr.getTimeHistoryList().size() <= 10);
-      assertTrue(String.format("Max deviation %s!=%s", tkr.getMaxDeviation(), 0), tkr.getMaxDeviation() == 10);
-      assertTrue(String.format("Max history %s!=%s", tkr.getMaxHistory(), 0), tkr.getMaxHistory() == 10);
+      assertEquals(String.format("Max deviation %s!=%s", 10, tkr.getMaxDeviation()), 10, tkr.getMaxDeviation());
+      assertEquals(String.format("Max history %s!=%s", 10, tkr.getMaxHistory()), 10, tkr.getMaxHistory());
 
     }
 
