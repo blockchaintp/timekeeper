@@ -31,6 +31,11 @@ SONAR_HOST_URL ?= https://sonarcloud.io
 SONAR_AUTH_TOKEN ?=
 
 ##
+# Kubernetes Settings
+##
+KUBE_CONFIG ?= $(PWD)/dummy-kubeconfig.yaml
+
+##
 # Maven related settings
 ##
 MAVEN_SETTINGS ?= $(shell if [ -r $(HOME)/.m2/settings.xml ]; then \
@@ -77,27 +82,31 @@ DOCKER_SOCK ?= /var/run/docker.sock
 TOOLCHAIN_IMAGE := blockchaintp/toolchain:latest
 TOOLCHAIN_HOME := /home/toolchain
 
+MAVEN_SETTINGS_VOL = $(shell if [ -n "$(MAVEN_SETTINGS)" ] && [ -r "$(MAVEN_SETTINGS)" ]; then echo -v \
+	$(MAVEN_SETTINGS):$(TOOLCHAIN_HOME)/.m2/settings.xml; fi)
+
+KUBE_CONFIG_VOL = $(shell if [ -n "$(KUBE_CONFIG)" ] && [ -r "$(KUBE_CONFIG)" ]; then echo -v \
+	$(KUBE_CONFIG):$(TOOLCHAIN_HOME)/.kube/config; fi)
+KUBE_CONFIG_ENV = $(shell if [ -n "$(KUBE_CONFIG)" ] && [ -r "$(KUBE_CONFIG)" ]; then echo -e \
+	KUBECONFIG=$(TOOLCHAIN_HOME)/.kube/config; fi)
+
 TOOL_VOLS = -v toolchain-home-$(ISOLATION_ID):/home/toolchain \
+	$(MAVEN_SETTINGS_VOL) $(KUBE_CONFIG_VOL) \
 	-v $(PWD):/project
 
 TOOL_ENVIRONMENT = -e GITHUB_TOKEN -e MAVEN_HOME=/home/toolchain/.m2 \
-	-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e FOSSA_API_KEY
+	-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e FOSSA_API_KEY \
+	$(KUBE_CONFIG_ENV)
 
-TOOL = $(DOCKER_RUN_USER) $(TOOL_ENVIRONMENT) $(TOOL_VOLS) \
-	-w $${WORKDIR:-/project}
-TOOL_DEFAULT = $(DOCKER_RUN_DEFAULT) $(TOOL_ENVIRONMENT) $(TOOL_VOLS) \
-	-w $${WORKDIR:-/project}
+TOOL_NOWORKDIR = $(DOCKER_RUN_USER) $(TOOL_ENVIRONMENT) $(TOOL_VOLS)
+TOOL_DEFAULT_NOWORKDIR = $(DOCKER_RUN_DEFAULT) $(TOOL_ENVIRONMENT) $(TOOL_VOLS)
+TOOL = $(TOOL_NOWORKDIR) -w $${WORKDIR:-/project}
+TOOL_DEFAULT = $(TOOL_DEFAULT_NOWRKDIR) -w $${WORKDIR:-/project}
 
-TOOLCHAIN := $(TOOL) \
-	$(shell if [ -n "$(MAVEN_SETTINGS)" ]; then echo -v \
-	$(MAVEN_SETTINGS):$(TOOLCHAIN_HOME)/.m2/settings.xml; fi) $(TOOLCHAIN_IMAGE)
+TOOLCHAIN := $(TOOL) $(TOOLCHAIN_IMAGE)
 DOCKER_MVN := $(TOOLCHAIN) mvn -Drevision=$(MAVEN_REVISION) -B
-BUSYBOX := $(DOCKER_RUN_USER) $(TOOL_VOLS) \
-	$(shell if [ -n "$(MAVEN_SETTINGS)" ]; then echo -v \
-	$(MAVEN_SETTINGS):$(TOOLCHAIN_HOME)/.m2/settings.xml; fi) busybox:latest
-BUSYBOX_ROOT := $(DOCKER_RUN_ROOT) $(TOOL_VOLS) \
-	$(shell if [ -n "$(MAVEN_SETTINGS)" ]; then echo -v \
-	$(MAVEN_SETTINGS):$(TOOLCHAIN_HOME)/.m2/settings.xml; fi) busybox:latest
+BUSYBOX := $(DOCKER_RUN_USER) $(TOOL_VOLS) busybox:latest
+BUSYBOX_ROOT := $(DOCKER_RUN_ROOT) $(TOOL_VOLS) busybox:latest
 
 DIVE_ANALYZE = $(TOOL) -v $(DOCKER_SOCK):/var/run/docker.sock \
 	--user toolchain:$(shell getent group docker|awk -F: '{print $$3}') \
@@ -310,7 +319,7 @@ build/$(REPO)-$(VERSION).tgz:
 $(MARKERS)/toolchain_vols:
 	docker volume create toolchain-home-$(ISOLATION_ID)
 	$(BUSYBOX_ROOT) chown -R $(UID):$(GID) $(TOOLCHAIN_HOME)
-	touch $@
+	@touch $@
 
 $(MARKERS)/build_toolchain_docker: $(MARKERS) $(MARKERS)/toolchain_vols
 	if ! docker image ls -qq $(TOOLCHAIN_IMAGE) > /dev/null; then \
@@ -319,12 +328,12 @@ $(MARKERS)/build_toolchain_docker: $(MARKERS) $(MARKERS)/toolchain_vols
 	else \
 	  echo "Toolchain $(TOOLCHAIN_IMAGE) already available"; \
 	fi
-	touch $@
+	@touch $@
 
 .PHONY: clean_toolchain_docker
 clean_toolchain_docker:
-	docker rmi -f $(TOOLCHAIN_IMAGE)
-	docker volume rm -f toolchain-home-$(ISOLATION_ID)
+	docker rmi -f $(TOOLCHAIN_IMAGE) || true
+	docker volume rm -f toolchain-home-$(ISOLATION_ID) || true
 	rm -f $(MARKERS)/toolchain_vols
 	rm -f $(MARKERS)/build_toolchain_docker
 
@@ -340,7 +349,7 @@ clean_markers:
 
 $(MARKERS)/build_go: $(MARKERS)/build_toolchain_docker
 	$(TOOLCHAIN) bash -c "if [ -r scripts/build ]; then scripts/build; else go build ./...; fi"
-	touch $@
+	@touch $@
 
 .PHONY: clean_build_go
 clean_build_go: $(MARKERS)/build_toolchain_docker
@@ -349,22 +358,27 @@ clean_build_go: $(MARKERS)/build_toolchain_docker
 
 $(MARKERS)/build_mvn: $(MARKERS)/build_toolchain_docker
 	$(DOCKER_MVN) compile
-	touch $@
+	@touch $@
 
 $(MARKERS)/package_mvn: $(MARKERS)/build_toolchain_docker
 	$(DOCKER_MVN) package
-	touch $@
+	@touch $@
 
 clean_mvn: $(MARKERS)/build_toolchain_docker
 	$(DOCKER_MVN) clean
 
+##
+# For this to work properly in pom.xml you need
+# <skipTests>true</skipTests> in the maven-surefire-plugin
+# configuration.
+##
 $(MARKERS)/test_mvn: $(MARKERS)/build_toolchain_docker
-	$(DOCKER_MVN) test
-	touch $@
+	$(DOCKER_MVN) -DskipTests=false test
+	@touch $@
 
 $(MARKERS)/test_go: $(MARKERS)/build_toolchain_docker
 	$(TOOLCHAIN) go test ./...
-	touch $@
+	@touch $@
 
 $(MARKERS)/publish_mvn: $(MARKERS)/build_toolchain_docker
 	echo $(DOCKER_MVN) clean deploy -DupdateReleaseInfo=$(MAVEN_UPDATE_RELEASE_INFO) \
@@ -392,7 +406,7 @@ clean_dirs: clean_dirs_standard
 $(MARKERS)/check_ignores:
 	git check-ignore build
 	git check-ignore $(MARKERS)
-	touch $@
+	@touch $@
 
 .PHONY: what_version
 what_version:
