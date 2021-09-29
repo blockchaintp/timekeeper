@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.3.13
+
+* test: correct sonar issues in ParticipantTimeStateTest [view commit](https://github.com/blockchaintp/timekeeper/commit/4da6f37a5a5b84933a3f0ed7a2436e85c8a82389)
+
 ## v1.3.12
 
 * build: add updated build scaffolding [view commit](https://github.com/blockchaintp/timekeeper/commit/8d1d911eb6188323fdc8375c60fecd6db2805b9f)
